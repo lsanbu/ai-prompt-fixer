@@ -11,6 +11,24 @@ interface ActionButtonsProps {
 }
 
 export const ActionButtons = ({ onAnalyze, onRewrite, onRun, isLoading }: ActionButtonsProps) => {
+  const handleAnalyze = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onAnalyze();
+  };
+
+  const handleRewrite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onRewrite();
+  };
+
+  const handleRun = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onRun();
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -19,9 +37,10 @@ export const ActionButtons = ({ onAnalyze, onRewrite, onRun, isLoading }: Action
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Button
-            onClick={onAnalyze}
+            onClick={handleAnalyze}
             disabled={isLoading}
             className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-3 h-auto flex-col space-y-2"
+            type="button"
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -32,9 +51,10 @@ export const ActionButtons = ({ onAnalyze, onRewrite, onRun, isLoading }: Action
           </Button>
           
           <Button
-            onClick={onRewrite}
+            onClick={handleRewrite}
             disabled={isLoading}
             className="bg-purple-500 hover:bg-purple-600 text-white font-medium py-3 h-auto flex-col space-y-2"
+            type="button"
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -45,9 +65,10 @@ export const ActionButtons = ({ onAnalyze, onRewrite, onRun, isLoading }: Action
           </Button>
           
           <Button
-            onClick={onRun}
+            onClick={handleRun}
             disabled={isLoading}
             className="bg-green-500 hover:bg-green-600 text-white font-medium py-3 h-auto flex-col space-y-2"
+            type="button"
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
