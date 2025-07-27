@@ -11,21 +11,24 @@ interface ActionButtonsProps {
 }
 
 export const ActionButtons = ({ onAnalyze, onRewrite, onRun, isLoading }: ActionButtonsProps) => {
-  const handleAnalyze = (e: React.MouseEvent) => {
+  const handleAnalyzeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Analyze button clicked');
     onAnalyze();
   };
 
-  const handleRewrite = (e: React.MouseEvent) => {
+  const handleRewriteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Rewrite button clicked');
     onRewrite();
   };
 
-  const handleRun = (e: React.MouseEvent) => {
+  const handleRunClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Run button clicked');
     onRun();
   };
 
@@ -37,10 +40,11 @@ export const ActionButtons = ({ onAnalyze, onRewrite, onRun, isLoading }: Action
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Button
-            onClick={handleAnalyze}
+            onClick={handleAnalyzeClick}
             disabled={isLoading}
             className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-3 h-auto flex-col space-y-2"
             type="button"
+            variant="default"
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -51,10 +55,11 @@ export const ActionButtons = ({ onAnalyze, onRewrite, onRun, isLoading }: Action
           </Button>
           
           <Button
-            onClick={handleRewrite}
+            onClick={handleRewriteClick}
             disabled={isLoading}
             className="bg-purple-500 hover:bg-purple-600 text-white font-medium py-3 h-auto flex-col space-y-2"
             type="button"
+            variant="default"
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -65,10 +70,11 @@ export const ActionButtons = ({ onAnalyze, onRewrite, onRun, isLoading }: Action
           </Button>
           
           <Button
-            onClick={handleRun}
+            onClick={handleRunClick}
             disabled={isLoading}
             className="bg-green-500 hover:bg-green-600 text-white font-medium py-3 h-auto flex-col space-y-2"
             type="button"
+            variant="default"
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
