@@ -3,8 +3,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { CheckCircle, FileText, Sparkles, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, FileText, Sparkles, AlertCircle, Copy, Check } from 'lucide-react';
 import { OutputData } from '@/pages/Index';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 interface OutputTabsProps {
   data: OutputData;
@@ -13,10 +16,35 @@ interface OutputTabsProps {
 }
 
 export const OutputTabs = ({ data, activeTab, onTabChange }: OutputTabsProps) => {
+  const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
+  const { toast } = useToast();
+
   const getScoreColor = (score: number) => {
     if (score >= 8) return 'bg-green-500';
     if (score >= 6) return 'bg-yellow-500';
     return 'bg-red-500';
+  };
+
+  const handleCopy = async (text: string, type: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedStates(prev => ({ ...prev, [type]: true }));
+      toast({
+        title: "Copied!",
+        description: `${type} copied to clipboard`,
+      });
+      
+      // Reset copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedStates(prev => ({ ...prev, [type]: false }));
+      }, 2000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to copy to clipboard",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -30,15 +58,15 @@ export const OutputTabs = ({ data, activeTab, onTabChange }: OutputTabsProps) =>
       <CardContent>
         <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="scoring" className="flex items-center space-x-2">
+            <TabsTrigger value="scoring" className="flex items-center space-x-2 data-[state=active]:bg-yellow-500 data-[state=active]:text-white">
               <CheckCircle className="h-4 w-4" />
               <span>Analysis</span>
             </TabsTrigger>
-            <TabsTrigger value="rewritten" className="flex items-center space-x-2">
+            <TabsTrigger value="rewritten" className="flex items-center space-x-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white">
               <FileText className="h-4 w-4" />
               <span>Rewrite</span>
             </TabsTrigger>
-            <TabsTrigger value="output" className="flex items-center space-x-2">
+            <TabsTrigger value="output" className="flex items-center space-x-2 data-[state=active]:bg-green-500 data-[state=active]:text-white">
               <Sparkles className="h-4 w-4" />
               <span>AI Output</span>
             </TabsTrigger>
@@ -83,8 +111,23 @@ export const OutputTabs = ({ data, activeTab, onTabChange }: OutputTabsProps) =>
           
           <TabsContent value="rewritten" className="mt-4">
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg">Rewritten Prompt</CardTitle>
+                {data.rewrittenPrompt && (
+                  <Button
+                    onClick={() => handleCopy(data.rewrittenPrompt!, 'Rewritten Prompt')}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center space-x-2"
+                  >
+                    {copiedStates['Rewritten Prompt'] ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                    <span>{copiedStates['Rewritten Prompt'] ? 'Copied!' : 'Copy'}</span>
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
                 {data.rewrittenPrompt ? (
@@ -105,8 +148,23 @@ export const OutputTabs = ({ data, activeTab, onTabChange }: OutputTabsProps) =>
           
           <TabsContent value="output" className="mt-4">
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg">AI Response</CardTitle>
+                {data.aiOutput && (
+                  <Button
+                    onClick={() => handleCopy(data.aiOutput!, 'AI Response')}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center space-x-2"
+                  >
+                    {copiedStates['AI Response'] ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                    <span>{copiedStates['AI Response'] ? 'Copied!' : 'Copy'}</span>
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
                 {data.aiOutput ? (
