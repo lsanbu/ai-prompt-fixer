@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { ToneSelector } from '@/components/ToneSelector';
@@ -158,15 +157,10 @@ const Index = () => {
 
     setIsLoading(true);
     try {
-      // Since your backend doesn't have a /run endpoint, we'll use the rewrite endpoint
-      // to generate AI output using the prompt
-      const response = await fetch('http://localhost:5000/api/prompt/rewrite', {
+      const response = await fetch('http://localhost:5000/api/prompt/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          prompt: `Please provide a comprehensive response to this prompt: ${promptToRun}`, 
-          mode: toneMode 
-        })
+        body: JSON.stringify({ prompt: promptToRun })
       });
 
       if (!response.ok) {
@@ -179,7 +173,7 @@ const Index = () => {
         throw new Error(data.error);
       }
 
-      setOutputData(prev => ({ ...prev, aiOutput: data.rewrite }));
+      setOutputData(prev => ({ ...prev, aiOutput: data.output }));
       setActiveTab('output');
       
       toast({
