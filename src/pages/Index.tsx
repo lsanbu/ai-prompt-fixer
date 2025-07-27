@@ -108,10 +108,13 @@ const Index = () => {
 
     setIsLoading(true);
     try {
+      const requestBody = { prompt, mode: toneMode };
+      console.log('Sending rewrite request with:', requestBody);
+      
       const response = await fetch('http://localhost:5000/api/prompt/rewrite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, mode: toneMode })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
@@ -119,6 +122,7 @@ const Index = () => {
       }
 
       const data = await response.json();
+      console.log('Received rewrite response:', data);
       
       if (data.error) {
         throw new Error(data.error);
