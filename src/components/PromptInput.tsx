@@ -33,12 +33,49 @@ export const PromptInput = ({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <MessageSquare className="h-5 w-5 text-purple-600" />
-          <span>Enter Your Prompt</span>
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center space-x-2">
+            <MessageSquare className="h-5 w-5 text-purple-600" />
+            <span>Enter Your Prompt</span>
+          </CardTitle>
+          
+          {/* Compact tone selector in header */}
+          <div className="flex items-center space-x-2">
+            <Palette className="h-4 w-4 text-purple-600" />
+            <Label className="text-sm font-medium whitespace-nowrap">Rewriting Tone</Label>
+            <Select
+              value={toneMode}
+              onValueChange={(val) => onToneModeChange(val as ToneMode)}
+              disabled={disabled}
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Select tone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Creative">
+                  <div className="flex flex-col">
+                    <span className="font-medium">Creative</span>
+                    <span className="text-xs text-gray-500">Imaginative and engaging</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="Academic">
+                  <div className="flex flex-col">
+                    <span className="font-medium">Academic</span>
+                    <span className="text-xs text-gray-500">Formal and research-focused</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="Technical">
+                  <div className="flex flex-col">
+                    <span className="font-medium">Technical</span>
+                    <span className="text-xs text-gray-500">Precise and detailed</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent>
         <div className="space-y-2">
           <Label htmlFor="promptInput" className="text-sm font-medium">
             Describe what you want the AI to do:
@@ -57,43 +94,6 @@ export const PromptInput = ({
             <span>Press Enter to Analyze & Score (Shift+Enter for new line)</span>
             <span>{value.length}/1000</span>
           </div>
-        </div>
-        
-        {/* Tone selector overlay */}
-        <div className="border-t pt-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <Palette className="h-4 w-4 text-purple-600" />
-            <Label className="text-sm font-medium">Rewriting Tone</Label>
-          </div>
-          <Select
-            value={toneMode}
-            onValueChange={(val) => onToneModeChange(val as ToneMode)}
-            disabled={disabled}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select tone" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Creative">
-                <div className="flex flex-col">
-                  <span className="font-medium">Creative</span>
-                  <span className="text-xs text-gray-500">Imaginative and engaging</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="Academic">
-                <div className="flex flex-col">
-                  <span className="font-medium">Academic</span>
-                  <span className="text-xs text-gray-500">Formal and research-focused</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="Technical">
-                <div className="flex flex-col">
-                  <span className="font-medium">Technical</span>
-                  <span className="text-xs text-gray-500">Precise and detailed</span>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </CardContent>
     </Card>
