@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
-import { ToneSelector } from '@/components/ToneSelector';
 import { ActionButtons } from '@/components/ActionButtons';
 import { OutputTabs } from '@/components/OutputTabs';
 import { Header } from '@/components/Header';
@@ -220,12 +219,8 @@ const Index = () => {
                 onChange={setPrompt}
                 disabled={isLoading}
                 onAnalyze={handleAnalyze}
-              />
-              
-              <ToneSelector
-                value={toneMode}
-                onChange={setToneMode}
-                disabled={isLoading}
+                toneMode={toneMode}
+                onToneModeChange={setToneMode}
               />
               
               <ActionButtons
