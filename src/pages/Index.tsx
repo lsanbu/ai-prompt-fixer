@@ -20,6 +20,27 @@ export interface OutputData {
   aiOutput?: string;
 }
 
+// Helper function to parse scoring feedback from backend
+const parseScoreFeedback = (feedback: string): ScoringResult => {
+  // Extract score (looking for patterns like "8/10", "Score: 7", etc.)
+  const scoreMatch = feedback.match(/(\d+)(?:\/10|\/10|(?:\s*out\s*of\s*10))/i) || 
+                    feedback.match(/(?:score|rating):\s*(\d+)/i) ||
+                    feedback.match(/(\d+)\s*(?:out\s*of\s*10)/i);
+  
+  const score = scoreMatch ? parseInt(scoreMatch[1]) : 5; // Default to 5 if no score found
+  
+  // Split feedback into lines and extract suggestions
+  const lines = feedback.split('\n').filter(line => line.trim());
+  const suggestions = lines.slice(1, 4).map(line => line.replace(/^-\s*/, '').trim()).filter(Boolean);
+  
+  // If no proper suggestions found, create generic ones
+  if (suggestions.length === 0) {
+    suggestions.push("Review the feedback above for specific improvement recommendations");
+  }
+  
+  return { score, suggestions };
+};
+
 const Index = () => {
   const [prompt, setPrompt] = useState('');
   const [toneMode, setToneMode] = useState<ToneMode>('Creative');
@@ -40,19 +61,24 @@ const Index = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call - replace with actual endpoint
-      const response = await fetch('/api/prompt/score', {
+      const response = await fetch('http://localhost:5000/api/prompt/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, mode: toneMode })
+        body: JSON.stringify({ prompt })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze prompt');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      setOutputData(prev => ({ ...prev, scoring: data }));
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      const scoringResult = parseScoreFeedback(data.score_feedback);
+      setOutputData(prev => ({ ...prev, scoring: scoringResult }));
       setActiveTab('scoring');
       
       toast({
@@ -60,21 +86,11 @@ const Index = () => {
         description: "Prompt analyzed successfully",
       });
     } catch (error) {
-      // Mock scoring for demo
-      const mockScoring = {
-        score: Math.floor(Math.random() * 4) + 6,
-        suggestions: [
-          "Add more specific context to improve clarity",
-          "Consider including examples for better results",
-          "The tone could be more engaging for the target audience"
-        ]
-      };
-      setOutputData(prev => ({ ...prev, scoring: mockScoring }));
-      setActiveTab('scoring');
-      
+      console.error('Error analyzing prompt:', error);
       toast({
-        title: "Demo Mode",
-        description: "Showing mock analysis results",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to analyze prompt",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -93,18 +109,22 @@ const Index = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call - replace with actual endpoint
-      const response = await fetch('/api/prompt/rewrite', {
+      const response = await fetch('http://localhost:5000/api/prompt/rewrite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, mode: toneMode })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to rewrite prompt');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
       setOutputData(prev => ({ ...prev, rewrittenPrompt: data.rewrite }));
       setActiveTab('rewritten');
       
@@ -113,14 +133,11 @@ const Index = () => {
         description: "Prompt rewritten successfully",
       });
     } catch (error) {
-      // Mock rewrite for demo
-      const mockRewrite = `Enhanced ${toneMode.toLowerCase()} version: ${prompt}\n\nPlease provide a comprehensive response that includes specific examples, detailed explanations, and actionable insights. Structure your answer with clear headings and bullet points where appropriate.`;
-      setOutputData(prev => ({ ...prev, rewrittenPrompt: mockRewrite }));
-      setActiveTab('rewritten');
-      
+      console.error('Error rewriting prompt:', error);
       toast({
-        title: "Demo Mode",
-        description: "Showing mock rewrite results",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to rewrite prompt",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -141,19 +158,28 @@ const Index = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call - replace with actual endpoint
-      const response = await fetch('/api/prompt/run', {
+      // Since your backend doesn't have a /run endpoint, we'll use the rewrite endpoint
+      // to generate AI output using the prompt
+      const response = await fetch('http://localhost:5000/api/prompt/rewrite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptToRun, mode: toneMode })
+        body: JSON.stringify({ 
+          prompt: `Please provide a comprehensive response to this prompt: ${promptToRun}`, 
+          mode: toneMode 
+        })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to run prompt');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      setOutputData(prev => ({ ...prev, aiOutput: data.output }));
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setOutputData(prev => ({ ...prev, aiOutput: data.rewrite }));
       setActiveTab('output');
       
       toast({
@@ -161,14 +187,11 @@ const Index = () => {
         description: "Prompt executed successfully",
       });
     } catch (error) {
-      // Mock output for demo
-      const mockOutput = `Here's a ${toneMode.toLowerCase()} response to your prompt:\n\n${promptToRun}\n\nThis is a demonstration of how the AI would respond to your optimized prompt. The actual implementation would connect to OpenAI's API to generate real responses based on your requirements.`;
-      setOutputData(prev => ({ ...prev, aiOutput: mockOutput }));
-      setActiveTab('output');
-      
+      console.error('Error running prompt:', error);
       toast({
-        title: "Demo Mode",
-        description: "Showing mock AI output",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to run prompt",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
