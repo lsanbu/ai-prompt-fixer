@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { ToneSelector } from '@/components/ToneSelector';
@@ -220,6 +219,7 @@ const Index = () => {
                 value={prompt}
                 onChange={setPrompt}
                 disabled={isLoading}
+                onAnalyze={handleAnalyze}
               />
               
               <ToneSelector

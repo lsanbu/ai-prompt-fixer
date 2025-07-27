@@ -8,9 +8,17 @@ interface PromptInputProps {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  onAnalyze?: () => void;
 }
 
-export const PromptInput = ({ value, onChange, disabled }: PromptInputProps) => {
+export const PromptInput = ({ value, onChange, disabled, onAnalyze }: PromptInputProps) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && onAnalyze) {
+      e.preventDefault();
+      onAnalyze();
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -26,15 +34,16 @@ export const PromptInput = ({ value, onChange, disabled }: PromptInputProps) => 
           </Label>
           <Textarea
             id="promptInput"
-            placeholder="e.g., Write a blog intro about AI in marketing..."
+            placeholder="e.g., Write a blog intro about AI in marketing... (Press Enter to Analyze)"
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
             disabled={disabled}
             className="min-h-[120px] resize-none"
             maxLength={1000}
           />
           <div className="flex justify-between text-xs text-gray-500">
-            <span>Be specific for better results</span>
+            <span>Press Enter to Analyze & Score (Shift+Enter for new line)</span>
             <span>{value.length}/1000</span>
           </div>
         </div>
