@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { PromptInput } from '@/components/PromptInput';
 import { ToneSelector } from '@/components/ToneSelector';
@@ -109,13 +110,23 @@ const Index = () => {
     setIsLoading(true);
     try {
       const requestBody = { prompt, mode: toneMode };
-      console.log('Sending rewrite request with:', requestBody);
+      console.log('=== REWRITE REQUEST DEBUG ===');
+      console.log('Current toneMode state:', toneMode);
+      console.log('Request body:', requestBody);
+      console.log('JSON stringified:', JSON.stringify(requestBody));
+      console.log('============================');
       
       const response = await fetch('http://localhost:5000/api/prompt/rewrite', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify(requestBody)
       });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
